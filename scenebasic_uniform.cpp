@@ -73,12 +73,15 @@ void SceneBasic_Uniform::initScene()
 
 void SceneBasic_Uniform::compile()
 {
-	try {
+	try 
+    {
 		prog.compileShader("shader/basic_uniform.vert");
 		prog.compileShader("shader/basic_uniform.frag");
 		prog.link();
 		prog.use();
-	} catch (GLSLProgramException &e) {
+	} 
+    catch (GLSLProgramException &e) 
+    {
 		cerr << e.what() << endl;
 		exit(EXIT_FAILURE);
 	}
