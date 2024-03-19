@@ -42,6 +42,9 @@
     <ClCompile Include="..\..\..\Public\OpenGL\src\glad.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="IslandScene.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="shader\basic_uniform.frag">
@@ -50,6 +53,8 @@
     <None Include="shader\basic_uniform.vert">
       <Filter>shaders</Filter>
     </None>
+    <None Include="shader\island_scene.frag" />
+    <None Include="shader\island_scene.vert" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="helper\scene.h">
@@ -71,6 +76,12 @@
       <Filter>helper</Filter>
     </ClInclude>
     <ClInclude Include="scenebasic_uniform.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="IslandScene.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="helper\Camera.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
