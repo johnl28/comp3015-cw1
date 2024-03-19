@@ -58,6 +58,7 @@ public:
         GLUtils::dumpGLInfo();
 
         // Initialization
+        glEnable(GL_DEPTH_TEST);
         glClearColor(0.5f,0.5f,0.5f,1.0f);
 #ifndef __APPLE__
 		if (debug) {
@@ -69,10 +70,12 @@ public:
 #endif
     }
 
-    int run(Scene & scene) {
+    int run(Scene & scene) 
+    {
         scene.setDimensions(fbw, fbh);
         scene.initScene();
         scene.resize(fbw, fbh);
+        scene.SetWindow(window);
 
         // Enter the main loop
         mainLoop(window, scene);
@@ -90,7 +93,8 @@ public:
         return EXIT_SUCCESS;
     }
 
-    static std::string parseCLArgs(int argc, char ** argv, std::map<std::string, std::string> & sceneData) {
+    static std::string parseCLArgs(int argc, char ** argv, std::map<std::string, std::string> & sceneData) 
+    {
         if( argc < 2 ) {
             printHelpInfo(argv[0], sceneData);
             exit(EXIT_FAILURE);
@@ -108,7 +112,8 @@ public:
     }
 
 private:
-    static void printHelpInfo(const char * exeFile,  std::map<std::string, std::string> & sceneData) {
+    static void printHelpInfo(const char * exeFile,  std::map<std::string, std::string> & sceneData) 
+    {
         printf("Usage: %s recipe-name\n\n", exeFile);
         printf("Recipe names: \n");
         for( auto it : sceneData ) {
@@ -116,8 +121,10 @@ private:
         }
     }
 
-    void mainLoop(GLFWwindow * window, Scene & scene) {
-        while( ! glfwWindowShouldClose(window) && !glfwGetKey(window, GLFW_KEY_ESCAPE) ) {
+    void mainLoop(GLFWwindow * window, Scene & scene) 
+    {
+        while( ! glfwWindowShouldClose(window) && !glfwGetKey(window, GLFW_KEY_ESCAPE) ) 
+        {
             GLUtils::checkForOpenGLError(__FILE__,__LINE__);
 			
             scene.update(float(glfwGetTime()));
