@@ -2,9 +2,12 @@
 
 #include <glm/glm.hpp>
 
+struct GLFWwindow;
+
 class Scene
 {
 protected:
+    GLFWwindow* window = nullptr;
 	glm::mat4 model, view, projection;
 
 public:
@@ -42,6 +45,11 @@ public:
     
     void animate( bool value ) { m_animate = value; }
     bool animating() { return m_animate; }
+
+    void SetWindow(GLFWwindow* window)
+    {
+        this->window = window;
+    }
     
 protected:
 	bool m_animate;
