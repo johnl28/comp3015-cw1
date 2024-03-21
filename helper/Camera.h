@@ -6,13 +6,14 @@
 
 struct Camera 
 {
-	glm::vec3 CameraPos { 0, 0, 0 };
-	glm::vec3 CameraFront { 0, 0, -1.0f };
-	glm::vec3 CameraUp { 0, 1.0f, 0 };
+	glm::vec3 CameraFront = { 0.0f, 0.0f, -1.0f };
+	glm::vec3 CameraPos = { 0.0f, 0.0f, 3.0f };
+	glm::vec3 CameraUp = { 0.0f, 1.0f, 0.0f };
+
 
 
 	glm::mat4 GetView()
 	{
-		return glm::lookAt(CameraFront, CameraPos, CameraUp);
+		return glm::lookAt(CameraPos, CameraPos + CameraFront, CameraUp);
 	}
 };
