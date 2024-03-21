@@ -18,7 +18,7 @@ public:
 
 private:
     void compileShaders();
-    void updateMVP(glm::mat4 model);
+    void updateMVP(const glm::mat4& model);
 
 private:
     GLuint vaoHandle;

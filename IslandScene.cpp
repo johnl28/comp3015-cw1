@@ -1,16 +1,21 @@
 #include <iostream>
 
+#include <glm/glm.hpp>
+#include <glm/gtx/string_cast.hpp>
+
 #include "helper/scenerunner.h"
 #include "IslandScene.h"
 
 IslandScene::IslandScene()
 {
-    projection = glm::perspective(glm::radians(80.0f), (float) width / (float) height, 0.1f, 1000.0f);
-    model = glm::mat4(1.0f);
+
 }
 
 void IslandScene::initScene()
 {
+    projection = glm::perspective(glm::radians(80.0f), (float)width / (float)height, 0.1f, 1000.0f);
+    model = glm::mat4(1.0f);
+
     compileShaders();
 
     m_shaderProgram.printActiveUniforms();
@@ -71,24 +76,38 @@ void IslandScene::compileShaders()
     }
 }
 
-void IslandScene::updateMVP(glm::mat4 model)
+void IslandScene::updateMVP(const glm::mat4& _model)
 {
     view = m_Camera.GetView();
-
     m_shaderProgram.setUniform("u_MVP", projection * view * model);
 }
 
 void IslandScene::update(float time)
 {
-    std::cout << time << std::endl;
-    if(glfwGetKey(window, GLFW_KEY_W))
+
+
+    const float cameraSpeed = 0.05f; // adjust accordingly
+    auto& cameraPos = m_Camera.CameraPos;
+    auto& cameraFront = m_Camera.CameraFront;
+    auto& cameraUp = m_Camera.CameraUp;
+
+    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
     {
-        //model = glm::mat4(1.0f);
-        model = glm::translate(model, { 0, 0, 1.0f * time });
-        //model = glm::rotate(model, glm::radians(-10.0f * deltaTime), glm::vec3(0.0f, 1.0f, 0.0f));
+        cameraPos += cameraSpeed * cameraFront;
+    }
+    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+    {
+        cameraPos -= cameraSpeed * cameraFront;
     }
 
-    m_Camera.CameraPos.z += 0.5f * time;
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+    {
+        cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+    }
+    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+    {
+        cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+    }
 }
 
 void IslandScene::render()
