@@ -84,8 +84,6 @@ void IslandScene::updateMVP(const glm::mat4& _model)
 
 void IslandScene::update(float time)
 {
-
-
     const float cameraSpeed = 0.05f; // adjust accordingly
     auto& cameraPos = m_Camera.CameraPos;
     auto& cameraFront = m_Camera.CameraFront;
