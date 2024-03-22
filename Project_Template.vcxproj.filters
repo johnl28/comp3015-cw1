@@ -84,5 +84,11 @@
     <ClInclude Include="helper\Camera.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="helper\Texture.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="helper\Mesh.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

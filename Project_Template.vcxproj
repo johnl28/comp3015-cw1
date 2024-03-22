@@ -162,10 +162,12 @@
     <ClInclude Include="helper\Camera.h" />
     <ClInclude Include="helper\glslprogram.h" />
     <ClInclude Include="helper\glutils.h" />
+    <ClInclude Include="helper\Mesh.h" />
     <ClInclude Include="helper\scene.h" />
     <ClInclude Include="helper\scenerunner.h" />
     <ClInclude Include="helper\stb\stb_image.h" />
     <ClInclude Include="helper\stb\stb_image_write.h" />
+    <ClInclude Include="helper\Texture.h" />
     <ClInclude Include="IslandScene.h" />
     <ClInclude Include="scenebasic_uniform.h" />
   </ItemGroup>
