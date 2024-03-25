@@ -6,6 +6,7 @@
 #include "helper/scenerunner.h"
 #include "IslandScene.h"
 
+
 IslandScene::IslandScene()
 {
 
@@ -14,50 +15,20 @@ IslandScene::IslandScene()
 void IslandScene::initScene()
 {
     projection = glm::perspective(glm::radians(80.0f), (float)width / (float)height, 0.1f, 1000.0f);
-    model = glm::mat4(1.0f);
+    m_Camera.CameraPos.z = 5.0f;
+    m_Camera.CameraPos.y = 5.0f;
 
     compileShaders();
 
     m_shaderProgram.printActiveUniforms();
 
-    /////////////////// Create the VBO ////////////////////
-    float positionData[] = {
-        -0.8f, -0.8f, 0.0f,
-         0.8f, -0.8f, 0.0f,
-         0.0f,  0.8f, 0.0f };
-    float colorData[] = {
-        1.0f, 0.0f, 0.0f,
-        0.0f, 1.0f, 0.0f,
-        0.0f, 0.0f, 1.0f };
+    initModels();
+}
 
-    // Create and populate the buffer objects
-    GLuint vboHandles[2];
-    glGenBuffers(2, vboHandles);
-    GLuint positionBufferHandle = vboHandles[0];
-    GLuint colorBufferHandle = vboHandles[1];
-
-    glBindBuffer(GL_ARRAY_BUFFER, positionBufferHandle);
-    glBufferData(GL_ARRAY_BUFFER, 9 * sizeof(float), positionData, GL_STATIC_DRAW);
-
-    glBindBuffer(GL_ARRAY_BUFFER, colorBufferHandle);
-    glBufferData(GL_ARRAY_BUFFER, 9 * sizeof(float), colorData, GL_STATIC_DRAW);
-
-    // Create and set-up the vertex array object
-    glGenVertexArrays(1, &vaoHandle);
-    glBindVertexArray(vaoHandle);
-
-    glEnableVertexAttribArray(0);  // Vertex position
-    glEnableVertexAttribArray(1);  // Vertex color
-
-
-    glBindVertexBuffer(0, positionBufferHandle, 0, sizeof(GLfloat) * 3);
-    glBindVertexBuffer(1, colorBufferHandle, 0, sizeof(GLfloat) * 3);
-
-    glVertexAttribFormat(0, 3, GL_FLOAT, GL_FALSE, 0);
-    glVertexAttribBinding(0, 0);
-    glVertexAttribFormat(1, 3, GL_FLOAT, GL_FALSE, 0);
-    glVertexAttribBinding(1, 1);
-    glBindVertexArray(0);
+void IslandScene::initModels()
+{
+    m_Model = new Model("media/source/Pirate Merchant Island.fbx");
+    m_Model->SetScale(glm::vec3(1.0f));
 }
 
 void IslandScene::compileShaders()
@@ -65,6 +36,7 @@ void IslandScene::compileShaders()
     try
     {
         m_shaderProgram.compileShader("shader/island_scene.vert");
+        m_shaderProgram.compileShader("shader/common.frag");
         m_shaderProgram.compileShader("shader/island_scene.frag");
         m_shaderProgram.link();
         m_shaderProgram.use();
@@ -76,15 +48,16 @@ void IslandScene::compileShaders()
     }
 }
 
-void IslandScene::updateMVP(const glm::mat4& _model)
-{
-    view = m_Camera.GetView();
-    m_shaderProgram.setUniform("u_MVP", projection * view * model);
-}
 
 void IslandScene::update(float time)
 {
-    const float cameraSpeed = 0.05f; // adjust accordingly
+    UpdateCameraInput();
+    UpdateCameraMouseInput();
+}
+
+void IslandScene::UpdateCameraInput()
+{
+    const float cameraSpeed = m_Camera.Speed;
     auto& cameraPos = m_Camera.CameraPos;
     auto& cameraFront = m_Camera.CameraFront;
     auto& cameraUp = m_Camera.CameraUp;
@@ -108,16 +81,63 @@ void IslandScene::update(float time)
     }
 }
 
+void IslandScene::UpdateCameraMouseInput()
+{
+    static bool firstMouse = true;
+    static double lastX = 0, lastY = 0;
+
+    if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS)
+    {
+        double xpos, ypos;
+        float &pitch = m_Camera.Pitch;
+        float& yaw = m_Camera.Yaw;
+        
+        glfwGetCursorPos(window, &xpos, &ypos);
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
+        if (firstMouse)
+        {
+            lastX = xpos;
+            lastY = ypos;
+            firstMouse = false;
+        }
+
+        auto xoffset = (xpos - lastX) * 0.1f;
+        auto yoffset = (lastY - ypos) * 0.1f;
+
+        lastX = xpos;
+        lastY = ypos;
+
+        if (pitch > 89.0f)
+        {
+            pitch = 89.0f;
+        }
+        else if (pitch < -89.0f)
+        {
+            pitch = -89.0f;
+        }
+
+        yaw += static_cast<float>(xoffset);
+        pitch += static_cast<float>(yoffset);
+    }
+    else if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_RELEASE)
+    {
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+        firstMouse = true;
+    }
+}
+
 void IslandScene::render()
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    m_shaderProgram.setUniform("u_Lights[0].Color", {1.0f, 1.0f, 1.0f});
+    m_shaderProgram.setUniform("u_Lights[0].Position", m_Camera.CameraPos + 5.0f);
 
-    updateMVP(model);
+    m_shaderProgram.setUniform("u_ViewPos", m_Camera.CameraPos);
+    m_shaderProgram.setUniform("u_View", m_Camera.GetView());
+    m_shaderProgram.setUniform("u_Projection", projection);
 
-    glBindVertexArray(vaoHandle);
-    glDrawArrays(GL_TRIANGLES, 0, 3);
-
-    glBindVertexArray(0);
+    m_Model->Draw(m_shaderProgram);
 }
 
 void IslandScene::resize(int w, int h)

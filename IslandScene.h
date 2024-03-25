@@ -5,6 +5,7 @@
 #include "helper/glslprogram.h"
 
 #include "helper/Camera.h"
+#include "helper/Model.h"
 
 class IslandScene: public Scene
 {
@@ -17,14 +18,20 @@ public:
     void resize(int, int);
 
 private:
+    void UpdateCameraInput();
+    void UpdateCameraMouseInput();
+
     void compileShaders();
-    void updateMVP(const glm::mat4& model);
+    void initModels();
 
 private:
+
     GLuint vaoHandle;
     GLSLProgram m_shaderProgram;
     Camera m_Camera;
 
     float angle = 0;
+
+    Model* m_Model = nullptr;
 };
 
