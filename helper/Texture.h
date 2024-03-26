@@ -6,10 +6,27 @@
 #include "stb/stb_image.h"
 
 
+enum class TextureType {
+	NONE = 0,
+    DIFFUSE = 1,
+    SPECULAR = 2,
+    AMBIENT = 3,
+    EMISSIVE = 4,
+    HEIGHT = 5,
+    NORMALS = 6,
+    SHININESS = 7,
+    OPACITY = 8,
+    DISPLACEMENT = 9,
+    LIGHTMAP = 10,
+    REFLECTION = 11
+};
+
 struct Texture 
 {
 	GLuint Id = 0;
 	bool Loaded = false;
+
+	TextureType Type = TextureType::NONE;
 
 	std::string FilePath = "";
 
@@ -20,14 +37,9 @@ struct Texture
 
 	Texture(const std::string& filePath): FilePath(filePath)
 	{
-		auto textureBuffer = stbi_load(filePath.c_str(), &Width, &Height, &Channels, 4);
-		if (!textureBuffer)
-		{
-			std::cout << "Failed to load texture " << filePath << std::endl;
-			return;
-		}
 
 		glGenTextures(1, &Id);
+		glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, Id);
 
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -35,12 +47,37 @@ struct Texture
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, Width, Height, 0, GL_RGBA, GL_UNSIGNED_BYTE, textureBuffer);
+		Load();
+	}
+
+	void Load()
+	{
+		auto textureBuffer = stbi_load(FilePath.c_str(), &Width, &Height, &Channels, 4);
+		if (!textureBuffer)
+		{
+			Loaded = false;
+			std::cout << "Failed to load texture " << FilePath << std::endl;
+			return;
+		}
+
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_SRGB_ALPHA, Width, Height, 0, GL_RGBA, GL_UNSIGNED_BYTE, textureBuffer);
 		glGenerateMipmap(GL_TEXTURE_2D);
 
 		stbi_image_free(textureBuffer);
-		std::cout << "Loaded texture " << filePath << std::endl;
+		std::cout << "Loaded texture " << FilePath << std::endl;
 		Loaded = true;
+	}
+
+	void Bind()
+	{
+		if (!Loaded)
+		{
+			throw std::runtime_error("Cannot bind unloaded texture");
+		}
+
+		glActiveTexture(GL_TEXTURE0 + (int)Type);
+		glBindTexture(GL_TEXTURE_2D, Id);
+
 	}
 
 	~Texture()
