@@ -34,38 +34,18 @@ Mesh::Mesh(const std::vector<Vertex>& vertices, const std::vector<GLuint> indice
 
 void Mesh::Draw(GLSLProgram& program)
 {
-
-    //for (unsigned int i = 0; i < textures.size(); i++)
-    //{
-    //    glActiveTexture(GL_TEXTURE0 + i); // activate proper texture unit before binding
-    //    // retrieve texture number (the N in diffuse_textureN)
-    //    string number;
-    //    string name = textures[i].type;
-    //    if (name == "texture_diffuse")
-    //        number = std::to_string(diffuseNr++);
-    //    else if (name == "texture_specular")
-    //        number = std::to_string(specularNr++);
-    //
-    //    shader.setInt(("material." + name + number).c_str(), i);
-    //    glBindTexture(GL_TEXTURE_2D, textures[i].id);
-    //}
-
     if (Texture)
     {
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, Texture->Id);
+        Texture->Bind();
+
+        program.setUniform("u_TextureDiffuse", (int)TextureType::DIFFUSE);
     }
-    program.setUniform("u_Texture", 0);
+
     program.setUniform("u_Transform", GetTransform());
 
     glBindVertexArray(m_VAO);
     glDrawElements(GL_TRIANGLES, m_Indices.size(), GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
-
-    if (Texture)
-    {
-        glBindTexture(GL_TEXTURE_2D, 0);
-    }
 }
 
 glm::mat4 Mesh::GetTransform()

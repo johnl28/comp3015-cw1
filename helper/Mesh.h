@@ -41,6 +41,8 @@ private:
 	std::vector<Vertex> m_Vertices;
 
 
+	// todo:
+	// std::vector<Texture> m_Textures;
 };
 
 
