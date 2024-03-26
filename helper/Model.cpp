@@ -16,7 +16,11 @@ Model::Model(const std::string& path)
         return;
     }
 
+
+	m_FileName = path.substr(path.find_last_of("/\\") + 1);
     LoadNode(scene, scene->mRootNode);
+
+	std::cout << "Loaded model: " << m_FileName << std::endl;
 }
 
 void Model::Draw(GLSLProgram& program)
@@ -99,21 +103,64 @@ void Model::LoadMesh(const aiMesh* aiMesh, const aiMaterial* aiMaterial)
 
 	if (texturePath.length)
 	{
-		std::string fullPath("media\\");
-		fullPath.append(texturePath.C_Str());
-
-		auto texture = new Texture(fullPath);
-		if (texture->Loaded)
-		{
-			mesh->Texture = new Texture(fullPath);
-		}
-		else
-		{
-			delete texture;
-		}
+		mesh->Texture = LoadTexture(texturePath.C_Str(), TextureType::DIFFUSE);
 	}
 
 
-
 	m_Meshes.push_back(mesh);
+}
+
+void Model::LoadTextures(const aiMaterial* aiMaterial, std::vector<std::unique_ptr<Texture>>& textures)
+{
+	for (int i = 1; i < aiTextureType_REFLECTION; ++i)
+	{
+		if (!aiMaterial->GetTextureCount((aiTextureType)i))
+		{
+			continue;
+		}
+
+		aiString texturePath;
+		aiMaterial->GetTexture((aiTextureType)i, 0, &texturePath);
+		if (!texturePath.length)
+		{
+			continue;
+		}
+
+		auto texture = LoadTexture(texturePath.C_Str(), (TextureType)i);
+		if (!texture)
+		{
+			continue;
+		}
+
+		textures.push_back(std::unique_ptr<Texture>(texture));
+	}
+}
+
+Texture* Model::LoadTexture(const std::string& path, TextureType type)
+{
+	// If texture not found, then make a lookup in ./media/textures/model name/
+	auto texture = new Texture(path);
+	texture->Type = type; 
+
+	if (texture->Loaded)
+	{
+		return texture;
+	}
+
+
+	std::string newPath("media\\textures\\" + m_FileName + "\\");
+	auto index = path.find_last_of("/\\");
+	newPath.append(path.substr(index + 1));
+
+	texture->FilePath = newPath;
+	texture->Load();
+
+	if (!texture->Loaded)
+	{
+		delete texture;
+		return nullptr;
+	}
+
+
+	return texture;
 }
