@@ -57,9 +57,17 @@ public:
 
         GLUtils::dumpGLInfo();
 
+        
         // Initialization
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glEnable(GL_BLEND);
         glEnable(GL_DEPTH_TEST);
+
+        glEnable(GL_FRAMEBUFFER_SRGB);
+
         glClearColor(0.5f,0.5f,0.5f,1.0f);
+
+
 #ifndef __APPLE__
 		if (debug) {
 			glDebugMessageCallback(GLUtils::debugCallback, nullptr);
