@@ -22,12 +22,19 @@ void IslandScene::initScene()
 
     m_shaderProgram.printActiveUniforms();
 
+    m_shaderProgram.use();
+    m_shaderProgram.setUniform("u_FogParams.MinDist", 200.2f);
+    m_shaderProgram.setUniform("u_FogParams.MaxDist", 1000.0f);
+    m_shaderProgram.setUniform("u_FogParams.Color", glm::vec4(0.949f, 0.957f, 0.965f, 1.0f));
+
+    m_shaderProgram.setUniform("u_ActivePointLights", 1);
+
     initModels();
 }
 
 void IslandScene::initModels()
 {
-    m_Model = new Model("media/source/Pirate Merchant Island.fbx");
+    m_Model = new Model("media/source/Stronghold.fbx");
     m_Model->SetScale(glm::vec3(1.0f));
 }
 
@@ -39,7 +46,7 @@ void IslandScene::compileShaders()
         m_shaderProgram.compileShader("shader/common.frag");
         m_shaderProgram.compileShader("shader/island_scene.frag");
         m_shaderProgram.link();
-        m_shaderProgram.use();
+        // m_shaderProgram.use();
     }
     catch (GLSLProgramException& e)
     {
@@ -130,8 +137,9 @@ void IslandScene::UpdateCameraMouseInput()
 void IslandScene::render()
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    m_shaderProgram.setUniform("u_Lights[0].Color", {1.0f, 1.0f, 1.0f});
-    m_shaderProgram.setUniform("u_Lights[0].Position", m_Camera.CameraPos + 5.0f);
+    m_shaderProgram.use();
+    m_shaderProgram.setUniform("u_PointLights[0].Color", {1.0f, 1.0f, 1.0f});
+    m_shaderProgram.setUniform("u_PointLights[0].Position", m_Camera.CameraPos + 5.0f);
 
     m_shaderProgram.setUniform("u_ViewPos", m_Camera.CameraPos);
     m_shaderProgram.setUniform("u_View", m_Camera.GetView());
