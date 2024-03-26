@@ -7,6 +7,7 @@ layout (location = 2) in vec2 VertexTextureCoords;
 out vec3 FragNormal;
 out vec2 FragTextureCoords;
 out vec3 FragPos;
+out vec3 FragViewPos;
 
 
 uniform mat4 u_Transform;
@@ -20,6 +21,7 @@ void main()
 
     FragTextureCoords = VertexTextureCoords;
 
+    FragViewPos = vec3(u_View * u_Transform * vec4(VertexPosition, 1.0));
     FragPos = vec3(u_Transform * vec4(VertexPosition, 1.0));
     FragNormal = mat3(transpose(inverse(u_Transform))) * VertexNormal;
 }
