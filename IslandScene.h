@@ -6,6 +6,9 @@
 
 #include "helper/Camera.h"
 #include "helper/Model.h"
+#include "helper/Skybox.h"
+
+#include "helper/PointLight.h"
 
 class IslandScene: public Scene
 {
@@ -21,17 +24,29 @@ private:
     void UpdateCameraInput();
     void UpdateCameraMouseInput();
 
+    void RenderLight();
+
     void compileShaders();
     void initModels();
 
 private:
 
     GLuint vaoHandle;
+
+    Skybox m_Skybox;
+
     GLSLProgram m_shaderProgram;
+    GLSLProgram m_LampShaderProgram;
+
+
     Camera m_Camera;
 
     float angle = 0;
 
     Model* m_Model = nullptr;
+
+    Model* m_LampModel = nullptr;
+
+    std::vector<PointLight> m_PointLights;
 };
 

@@ -27,15 +27,27 @@ void IslandScene::initScene()
     m_shaderProgram.setUniform("u_FogParams.MaxDist", 1000.0f);
     m_shaderProgram.setUniform("u_FogParams.Color", glm::vec4(0.949f, 0.957f, 0.965f, 1.0f));
 
-    m_shaderProgram.setUniform("u_ActivePointLights", 1);
+    m_LampModel = new Model("media/models/shapes/cube.fbx");
+    m_LampModel->SetScale(glm::vec3(0.1f));
+
+
+    PointLight pointLight;
+    pointLight.Color = { 1.0f, 0.5f, 1.0f };
+    pointLight.Position = { 30.0f, 10.0f, 0.0f };
+    m_PointLights.push_back(pointLight);
+
+    PointLight pointLight2;
+    pointLight2.Color = { 1.0f, 1.0f, 1.0f };
+    pointLight2.Position = { 30.0f, 50.0f, 150.0f };
+    m_PointLights.push_back(pointLight2);
 
     initModels();
 }
 
 void IslandScene::initModels()
 {
-    m_Model = new Model("media/source/Stronghold.fbx");
-    m_Model->SetScale(glm::vec3(1.0f));
+    m_Model = new Model("media/models/FullPlatform-art.fbx");
+    m_Model->SetScale(glm::vec3(0.2f));
 }
 
 void IslandScene::compileShaders()
@@ -46,7 +58,10 @@ void IslandScene::compileShaders()
         m_shaderProgram.compileShader("shader/common.frag");
         m_shaderProgram.compileShader("shader/island_scene.frag");
         m_shaderProgram.link();
-        // m_shaderProgram.use();
+
+        m_LampShaderProgram.compileShader("shader/lamp.vert");
+        m_LampShaderProgram.compileShader("shader/lamp.frag");
+        m_LampShaderProgram.link();
     }
     catch (GLSLProgramException& e)
     {
@@ -134,18 +149,46 @@ void IslandScene::UpdateCameraMouseInput()
     }
 }
 
+void IslandScene::RenderLight()
+{
+
+    m_LampShaderProgram.use();
+    m_LampShaderProgram.setUniform("u_View", m_Camera.GetView());
+    m_LampShaderProgram.setUniform("u_Projection", projection);
+
+
+    for (int i = 0; i < m_PointLights.size(); ++i)
+    {
+        auto& pointLight = m_PointLights[i];
+        m_shaderProgram.use();
+        m_shaderProgram.setUniform(("u_PointLights[" + std::to_string(i) + "].Color").c_str(), pointLight.Color);
+        m_shaderProgram.setUniform(("u_PointLights[" + std::to_string(i) + "].Position").c_str(), pointLight.Position);
+
+        m_LampShaderProgram.use();
+        m_LampShaderProgram.setUniform("u_LightColor", pointLight.Color);
+        m_LampModel->SetPosition(pointLight.Position);
+        m_LampModel->Draw(m_LampShaderProgram);
+    }
+
+}
+
 void IslandScene::render()
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    m_shaderProgram.use();
-    m_shaderProgram.setUniform("u_PointLights[0].Color", {1.0f, 1.0f, 1.0f});
-    m_shaderProgram.setUniform("u_PointLights[0].Position", m_Camera.CameraPos + 5.0f);
 
+
+    RenderLight();
+
+
+    m_shaderProgram.use();
     m_shaderProgram.setUniform("u_ViewPos", m_Camera.CameraPos);
     m_shaderProgram.setUniform("u_View", m_Camera.GetView());
     m_shaderProgram.setUniform("u_Projection", projection);
+    m_shaderProgram.setUniform("u_ActivePointLights", static_cast<int>(m_PointLights.size()));
 
     m_Model->Draw(m_shaderProgram);
+
+    m_Skybox.Draw(m_Camera, projection);
 }
 
 void IslandScene::resize(int w, int h)
