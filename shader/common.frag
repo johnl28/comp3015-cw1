@@ -19,7 +19,7 @@ vec4 CalculateFog(FogParams fogParams, vec3 fragViewPos, vec4 fragColor)
     return mix(fogParams.Color, fragColor, fog_factor);
 }
 
-vec3 CalculateAmbientLight(vec3 ambientStrength, vec3 lightColor)
+vec3 CalculateAmbientLight(float ambientStrength, vec3 lightColor)
 {
     return ambientStrength * lightColor;
 }
