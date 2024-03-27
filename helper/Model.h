@@ -18,17 +18,31 @@ public:
 	void Draw(GLSLProgram& program);
 
 	void SetScale(const glm::vec3& scale);
+	void SetPosition(const glm::vec3& pos);
+
+
+	int GetMeshCount() { return static_cast<int>(m_Meshes.size()); }
+
+	std::shared_ptr<Mesh> GetMesh(int index) 
+	{ 
+		if (index >= GetMeshCount())
+		{
+			return nullptr;
+		}
+
+		return m_Meshes[index]; 
+	};
 
 private:
 	void LoadNode(const aiScene* scene, aiNode* node);
 	void LoadMesh(const aiMesh* aiMesh, const aiMaterial* aiMaterial);
-	void LoadTextures(const aiMaterial* aiMaterial, std::vector<std::unique_ptr<Texture>>& textures);
+	void LoadTextures(const aiMaterial* aiMaterial, Mesh* mesh);
 
 	Texture* LoadTexture(const std::string& path, TextureType type);
 
 private:
 	std::string m_FileName = "";
-	std::vector<Mesh*> m_Meshes;
+	std::vector<std::shared_ptr<Mesh>> m_Meshes;
 };
 
 

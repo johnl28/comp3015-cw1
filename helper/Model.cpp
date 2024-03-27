@@ -39,6 +39,14 @@ void Model::SetScale(const glm::vec3& scale)
 	}
 }
 
+void Model::SetPosition(const glm::vec3& pos)
+{
+	for (auto& mesh : m_Meshes)
+	{
+		mesh->SetPosition(pos);
+	}
+}
+
 void Model::LoadNode(const aiScene* scene, aiNode* node)
 {
     for (unsigned int i = 0; i < node->mNumMeshes; ++i)
@@ -98,19 +106,21 @@ void Model::LoadMesh(const aiMesh* aiMesh, const aiMaterial* aiMaterial)
 	auto mesh = new Mesh(vertices, indices);
 
 
-	aiString texturePath;
-	aiMaterial->GetTexture(aiTextureType_DIFFUSE, 0, &texturePath);
+	//aiString texturePath;
+	//aiMaterial->GetTexture(aiTextureType_DIFFUSE, 0, &texturePath);
+	//
+	//if (texturePath.length)
+	//{
+	//	mesh->DiffTexture = LoadTexture(texturePath.C_Str(), TextureType::DIFFUSE);
+	//}
 
-	if (texturePath.length)
-	{
-		mesh->Texture = LoadTexture(texturePath.C_Str(), TextureType::DIFFUSE);
-	}
+	LoadTextures(aiMaterial, mesh);
 
 
-	m_Meshes.push_back(mesh);
+	m_Meshes.push_back(std::shared_ptr<Mesh>(mesh));
 }
 
-void Model::LoadTextures(const aiMaterial* aiMaterial, std::vector<std::unique_ptr<Texture>>& textures)
+void Model::LoadTextures(const aiMaterial* aiMaterial, Mesh* mesh)
 {
 	for (int i = 1; i < aiTextureType_REFLECTION; ++i)
 	{
@@ -132,9 +142,10 @@ void Model::LoadTextures(const aiMaterial* aiMaterial, std::vector<std::unique_p
 			continue;
 		}
 
-		textures.push_back(std::unique_ptr<Texture>(texture));
+		mesh->AddTexture(texture);
 	}
 }
+
 
 Texture* Model::LoadTexture(const std::string& path, TextureType type)
 {
