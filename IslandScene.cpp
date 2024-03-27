@@ -23,22 +23,24 @@ void IslandScene::initScene()
     m_shaderProgram.printActiveUniforms();
 
     m_shaderProgram.use();
-    m_shaderProgram.setUniform("u_FogParams.MinDist", 200.2f);
+    m_shaderProgram.setUniform("u_FogParams.MinDist", 500.2f);
     m_shaderProgram.setUniform("u_FogParams.MaxDist", 1000.0f);
     m_shaderProgram.setUniform("u_FogParams.Color", glm::vec4(0.949f, 0.957f, 0.965f, 1.0f));
 
     m_LampModel = new Model("media/models/shapes/cube.fbx");
-    m_LampModel->SetScale(glm::vec3(0.1f));
+    m_LampModel->SetScale(glm::vec3(0.05f));
 
 
     PointLight pointLight;
-    pointLight.Color = { 1.0f, 0.5f, 1.0f };
+    pointLight.Color = { 1.0f, 0.1f, 1.0f };
     pointLight.Position = { 30.0f, 10.0f, 0.0f };
+    pointLight.Intensity = 100.0f;
     m_PointLights.push_back(pointLight);
 
     PointLight pointLight2;
     pointLight2.Color = { 1.0f, 1.0f, 1.0f };
-    pointLight2.Position = { 30.0f, 50.0f, 150.0f };
+    pointLight2.Position = { 30.0f, 5.0f, 150.0f };
+    pointLight2.Intensity = 500.0f;
     m_PointLights.push_back(pointLight2);
 
     initModels();
@@ -75,6 +77,11 @@ void IslandScene::update(float time)
 {
     UpdateCameraInput();
     UpdateCameraMouseInput();
+
+    const float radius = 150.0f;
+    m_PointLights[0].Position.x = sin(time) * radius;
+    m_PointLights[0].Position.z = cos(time) * radius;
+
 }
 
 void IslandScene::UpdateCameraInput()
@@ -163,6 +170,7 @@ void IslandScene::RenderLight()
         m_shaderProgram.use();
         m_shaderProgram.setUniform(("u_PointLights[" + std::to_string(i) + "].Color").c_str(), pointLight.Color);
         m_shaderProgram.setUniform(("u_PointLights[" + std::to_string(i) + "].Position").c_str(), pointLight.Position);
+        m_shaderProgram.setUniform(("u_PointLights[" + std::to_string(i) + "].Intensity").c_str(), pointLight.Intensity);
 
         m_LampShaderProgram.use();
         m_LampShaderProgram.setUniform("u_LightColor", pointLight.Color);
