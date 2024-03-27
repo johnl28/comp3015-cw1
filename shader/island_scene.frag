@@ -11,8 +11,9 @@ out vec4 FragColor;
 
 uniform sampler2D u_TextureDiffuse;
 
-// uniform bool u_UseTextureOpacity;
-// uniform sampler2D u_TextureOpacity;
+
+uniform bool u_UseTextureOpacity;
+uniform sampler2D u_TextureOpacity;
 
 uniform vec3 u_ViewPos;
 uniform int u_ActivePointLights;
@@ -40,19 +41,20 @@ vec3 CalculateBlinnPhong(vec3 normal, vec3 lightDir, vec3 viewDir, vec3 lightCol
 void main() 
 {
 	vec3 norm = normalize(FragNormal);
+
     vec3 viewDir = normalize(u_ViewPos - FragPos);
 
-	vec3 textureColor = texture(u_TextureDiffuse, FragTextureCoords).rgb;
+	vec4 textureColor = texture(u_TextureDiffuse, FragTextureCoords);
 
-    // if(u_UseTextureOpacity)
-    // {
-    //     vec3 textureOpacity = texture(u_TextureOpacity, FragTextureCoords).rgb;
-    // 
-    //     if(textureOpacity == vec3(0))
-    //     {
-    //         discard;
-    //     }
-    // }
+    if(u_UseTextureOpacity)
+    {
+        float textureOpacity = texture(u_TextureOpacity, FragTextureCoords).r;
+    
+        if(textureOpacity == 0)
+        {
+            discard;
+        }
+    }
 
 
 
@@ -64,13 +66,13 @@ void main()
     {
         vec3 lightDir = normalize(u_PointLights[i].Position - FragPos);
 
-        diffuse = CalculateDiffusePointLight(norm, lightDir, u_PointLights[i].Color);
-        specular = CalculateBlinnPhong(norm, lightDir, viewDir, u_PointLights[i].Color);
+        diffuse += CalculateDiffusePointLight(norm, lightDir, u_PointLights[i].Color);
+        specular += CalculateBlinnPhong(norm, lightDir, viewDir, u_PointLights[i].Color);
     }
 
-    vec3 result = (ambient + diffuse + specular) * textureColor;
+    vec4 result = vec4(ambient + diffuse + specular, 1.0) * textureColor;
     
-    FragColor = CalculateFog(u_FogParams, FragViewPos, vec4(result, 1.0));
+    FragColor = CalculateFog(u_FogParams, FragViewPos, result);
 
 }
  
