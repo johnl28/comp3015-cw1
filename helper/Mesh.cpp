@@ -32,13 +32,35 @@ Mesh::Mesh(const std::vector<Vertex>& vertices, const std::vector<GLuint> indice
     glBindVertexArray(0);
 }
 
+Mesh::~Mesh()
+{
+    glBindVertexArray(0);
+
+    glDeleteBuffers(1, &m_IBO);
+    glDeleteBuffers(1, &m_VBO);
+    glDeleteVertexArrays(1, &m_VAO);
+}
+
 void Mesh::Draw(GLSLProgram& program)
 {
-    if (Texture)
+    program.use();
+    for (const auto& texture : m_Textures)
     {
-        Texture->Bind();
+        texture->Bind();
 
         program.setUniform("u_TextureDiffuse", (int)TextureType::DIFFUSE);
+
+        if (texture->Type == TextureType::OPACITY)
+        {
+            program.setUniform("u_TextureOpacity", (int)TextureType::OPACITY);
+            program.setUniform("u_UseTextureOpacity", true);
+        }
+        else
+        {
+            program.setUniform("u_UseTextureOpacity", false);
+        }
+
+
     }
 
     program.setUniform("u_Transform", GetTransform());
@@ -46,6 +68,11 @@ void Mesh::Draw(GLSLProgram& program)
     glBindVertexArray(m_VAO);
     glDrawElements(GL_TRIANGLES, m_Indices.size(), GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
+}
+
+void Mesh::AddTexture(Texture* texture)
+{
+    m_Textures.push_back(std::unique_ptr<Texture>(texture));
 }
 
 glm::mat4 Mesh::GetTransform()

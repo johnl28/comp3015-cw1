@@ -18,15 +18,23 @@ struct Vertex {
 class Mesh {
 
 public:
-	Texture* Texture = nullptr;
 
 	Mesh(const std::vector<Vertex>& vertices, const std::vector<GLuint> indices);
+	~Mesh();
 
 	void Draw(GLSLProgram& program);
 	void SetScale(const glm::vec3& newScale) { m_Scale = newScale; }
+	void SetPosition(const glm::vec3& pos) { m_Position = pos; }
+
+	void AddTexture(Texture* texture);
+
+	GLuint GetVAO() { return m_VAO; }
+	int GetIndicesCount() { return static_cast<int>(m_Indices.size()); }
 
 	glm::mat4 GetTransform();
 
+	Mesh(const Mesh&) = delete;
+	Mesh& operator=(const Mesh&) = delete;
 
 private:
 	GLuint m_VAO = 0;
@@ -41,8 +49,7 @@ private:
 	std::vector<Vertex> m_Vertices;
 
 
-	// todo:
-	// std::vector<Texture> m_Textures;
+	std::vector<std::unique_ptr<Texture>> m_Textures;
 };
 
 
