@@ -63,7 +63,7 @@ public:
         glEnable(GL_BLEND);
         glEnable(GL_DEPTH_TEST);
 
-        glEnable(GL_FRAMEBUFFER_SRGB);
+       // glEnable(GL_FRAMEBUFFER_SRGB);
 
         glClearColor(0.5f,0.5f,0.5f,1.0f);
 
