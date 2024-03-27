@@ -154,6 +154,7 @@
     <ClCompile Include="IslandScene.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="scenebasic_uniform.cpp" />
+    <ClCompile Include="helper\Skybox.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="shader\basic_uniform.frag" />
@@ -161,6 +162,10 @@
     <None Include="shader\common.frag" />
     <None Include="shader\island_scene.frag" />
     <None Include="shader\island_scene.vert" />
+    <None Include="shader\lamp.frag" />
+    <None Include="shader\lamp.vert" />
+    <None Include="shader\skybox.frag" />
+    <None Include="shader\skybox.vert" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="helper\Camera.h" />
@@ -174,7 +179,9 @@
     <ClInclude Include="helper\stb\stb_image_write.h" />
     <ClInclude Include="helper\Texture.h" />
     <ClInclude Include="IslandScene.h" />
+    <ClInclude Include="helper\PointLight.h" />
     <ClInclude Include="scenebasic_uniform.h" />
+    <ClInclude Include="helper\Skybox.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
