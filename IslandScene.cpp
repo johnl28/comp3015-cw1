@@ -31,17 +31,23 @@ void IslandScene::initScene()
     m_LampModel->SetScale(glm::vec3(0.05f));
 
 
-    PointLight pointLight;
-    pointLight.Color = { 1.0f, 0.1f, 1.0f };
-    pointLight.Position = { 30.0f, 10.0f, 0.0f };
-    pointLight.Intensity = 100.0f;
-    m_PointLights.push_back(pointLight);
+    PointLight pinkPointLight;
+    pinkPointLight.Color = { 1.0f, 0.1f, 1.0f };
+    pinkPointLight.Position = { 30.0f, 10.0f, 0.0f };
+    pinkPointLight.Intensity = 500.0f;
+    m_PointLights.push_back(pinkPointLight);
 
-    PointLight pointLight2;
-    pointLight2.Color = { 1.0f, 1.0f, 1.0f };
-    pointLight2.Position = { 30.0f, 5.0f, 150.0f };
-    pointLight2.Intensity = 500.0f;
-    m_PointLights.push_back(pointLight2);
+    PointLight whitePointLight;
+    whitePointLight.Color = { 1.0f, 1.0f, 1.0f };
+    whitePointLight.Position = { 30.0f, 5.0f, 150.0f };
+    whitePointLight.Intensity = 500.0f;
+    m_PointLights.push_back(whitePointLight);
+
+    PointLight randomPointLight;
+    randomPointLight.Color = { 0.0f, 1.0f, 0.0f };
+    randomPointLight.Position = { -230.0f, 75.0f, 120.0f };
+    randomPointLight.Intensity = 100.0f;
+    m_PointLights.push_back(randomPointLight);
 
     initModels();
 }
@@ -78,10 +84,15 @@ void IslandScene::update(float time)
     UpdateCameraInput();
     UpdateCameraMouseInput();
 
-    const float radius = 150.0f;
+    constexpr float radius = 150.0f;
     m_PointLights[0].Position.x = sin(time) * radius;
     m_PointLights[0].Position.z = cos(time) * radius;
 
+    m_PointLights[1].Position.y = sin(time) * 20.0f;
+
+    m_PointLights[2].Color.r = sin(time);
+    m_PointLights[2].Color.g = tan(time);
+    m_PointLights[2].Color.b = cos(time);
 }
 
 void IslandScene::UpdateCameraInput()
