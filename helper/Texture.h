@@ -39,7 +39,6 @@ struct Texture
 	{
 
 		glGenTextures(1, &Id);
-		glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, Id);
 
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
