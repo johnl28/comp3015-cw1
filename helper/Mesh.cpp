@@ -48,11 +48,11 @@ void Mesh::Draw(GLSLProgram& program)
     {
         texture->Bind();
 
-        program.setUniform("u_TextureDiffuse", (int)TextureType::DIFFUSE);
+        program.setUniform("u_Textures.Diffuse", (int)TextureType::DIFFUSE);
 
         if (texture->Type == TextureType::OPACITY)
         {
-            program.setUniform("u_TextureOpacity", (int)TextureType::OPACITY);
+            program.setUniform("u_Textures.AlphaMap", (int)TextureType::OPACITY);
             program.setUniform("u_UseTextureOpacity", true);
         }
         else
