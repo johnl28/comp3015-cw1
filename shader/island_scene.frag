@@ -24,7 +24,6 @@ uniform struct TextureSamplers {
 
 
 
-
 uniform vec3 u_ViewPos;
 uniform int u_ActivePointLights;
 
@@ -53,29 +52,27 @@ vec3 CalculateBlinnPhong(vec3 normal, vec3 lightDir, vec3 viewDir, vec3 lightCol
 void main() 
 {
 	vec3 norm = normalize(FragIn.Normal);
-
     vec3 viewDir = normalize(u_ViewPos - FragIn.FragPosition);
-
 	vec4 textureColor = texture(u_Textures.Diffuse, FragIn.TextureCoords);
+
 
     if(u_UseTextureOpacity)
     {
-        float textureOpacity = texture(u_Textures.AlphaMap, FragIn.TextureCoords).r;
-    
-        if(textureOpacity == 0)
+        float fragmentOpacity = texture(u_Textures.AlphaMap, FragIn.TextureCoords).r;
+
+        if(fragmentOpacity < 0.1)
         {
             discard;
         }
     }
 
 
-    vec3 ambient = CalculateAmbientLight(0.01, vec3(1.0));
+    vec3 ambient = CalculateAmbientLight(0.1, vec3(1.0));
     vec3 diffuse = vec3(0.0);
     vec3 specular = vec3(0.0);
 
     for(int i = 0; i < u_ActivePointLights; i++)
     {
-
         vec3 fragToLight = u_PointLights[i].Position - FragIn.FragPosition;
         float distanceToLight = length(fragToLight);
         vec3 lightDir = normalize(fragToLight);
@@ -86,7 +83,6 @@ void main()
 
         diffuse += CalculateDiffusePointLight(norm, lightDir, intensityColor) * attenuation;
         specular += CalculateBlinnPhong(norm, lightDir, viewDir, intensityColor) * attenuation;
-
     }
 
     vec4 result = vec4(ambient + diffuse + specular, 1.0) * textureColor;

@@ -79,9 +79,10 @@ void IslandScene::update(float time)
 
     m_PointLights[1].Position.y = sin(time) * 20.0f;
 
-    m_PointLights[2].Color.r = sin(time);
-    m_PointLights[2].Color.g = tan(time);
-    m_PointLights[2].Color.b = cos(time);
+    m_PointLights[2].Color.r = (sin(time * 0.5) + 1.0f) * 0.5f;
+    m_PointLights[2].Color.g = (cos(time * 0.7) + 1.0f) * 0.5f;
+    m_PointLights[2].Color.b = (cos(time * 0.9) + 1.0f) * 0.5f;
+
 }
 
 void IslandScene::UpdateCameraInput()
@@ -173,7 +174,7 @@ void IslandScene::initLight()
     PointLight randomPointLight;
     randomPointLight.Color = { 0.0f, 1.0f, 0.0f };
     randomPointLight.Position = { -230.0f, 75.0f, 120.0f };
-    randomPointLight.Intensity = 100.0f;
+    randomPointLight.Intensity = 10.0f;
     m_PointLights.push_back(randomPointLight);
 }
 
