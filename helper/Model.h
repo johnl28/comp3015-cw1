@@ -17,6 +17,7 @@ public:
 	Model(const std::string& path);
 	void Draw(GLSLProgram& program);
 
+	void SetScale(float scale);
 	void SetScale(const glm::vec3& scale);
 	void SetPosition(const glm::vec3& pos);
 
