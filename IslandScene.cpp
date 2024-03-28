@@ -27,28 +27,13 @@ void IslandScene::initScene()
     m_shaderProgram.setUniform("u_FogParams.MaxDist", 1000.0f);
     m_shaderProgram.setUniform("u_FogParams.Color", glm::vec4(0.949f, 0.957f, 0.965f, 1.0f));
 
-    m_LampModel = new Model("media/models/shapes/cube.fbx");
-    m_LampModel->SetScale(glm::vec3(0.05f));
+    m_LampShaderProgram.use();
+    m_LampShaderProgram.setUniform("u_FogParams.MinDist", 500.2f);
+    m_LampShaderProgram.setUniform("u_FogParams.MaxDist", 1000.0f);
+    m_LampShaderProgram.setUniform("u_FogParams.Color", glm::vec4(0.949f, 0.957f, 0.965f, 1.0f));
 
 
-    PointLight pinkPointLight;
-    pinkPointLight.Color = { 1.0f, 0.1f, 1.0f };
-    pinkPointLight.Position = { 30.0f, 10.0f, 0.0f };
-    pinkPointLight.Intensity = 500.0f;
-    m_PointLights.push_back(pinkPointLight);
-
-    PointLight whitePointLight;
-    whitePointLight.Color = { 1.0f, 1.0f, 1.0f };
-    whitePointLight.Position = { 30.0f, 5.0f, 150.0f };
-    whitePointLight.Intensity = 500.0f;
-    m_PointLights.push_back(whitePointLight);
-
-    PointLight randomPointLight;
-    randomPointLight.Color = { 0.0f, 1.0f, 0.0f };
-    randomPointLight.Position = { -230.0f, 75.0f, 120.0f };
-    randomPointLight.Intensity = 100.0f;
-    m_PointLights.push_back(randomPointLight);
-
+    initLight();
     initModels();
 }
 
@@ -56,6 +41,9 @@ void IslandScene::initModels()
 {
     m_Model = new Model("media/models/FullPlatform-art.fbx");
     m_Model->SetScale(glm::vec3(0.2f));
+
+    m_LampModel = new Model("media/models/shapes/cube.fbx");
+    m_LampModel->SetScale(glm::vec3(0.05f));
 }
 
 void IslandScene::compileShaders()
@@ -68,6 +56,7 @@ void IslandScene::compileShaders()
         m_shaderProgram.link();
 
         m_LampShaderProgram.compileShader("shader/lamp.vert");
+        m_LampShaderProgram.compileShader("shader/common.frag");
         m_LampShaderProgram.compileShader("shader/lamp.frag");
         m_LampShaderProgram.link();
     }
@@ -123,30 +112,28 @@ void IslandScene::UpdateCameraInput()
 
 void IslandScene::UpdateCameraMouseInput()
 {
-    static bool firstMouse = true;
-    static double lastX = 0, lastY = 0;
+    static double lastX = 0.0, lastY = 0.0;
 
     if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS)
     {
-        double xpos, ypos;
-        float &pitch = m_Camera.Pitch;
+        double currX = 0.0, currY = 0.0;
+        float& pitch = m_Camera.Pitch;
         float& yaw = m_Camera.Yaw;
         
-        glfwGetCursorPos(window, &xpos, &ypos);
+        glfwGetCursorPos(window, &currX, &currY);
         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
-        if (firstMouse)
+        if (!lastX && !lastY)
         {
-            lastX = xpos;
-            lastY = ypos;
-            firstMouse = false;
+            lastX = currX;
+            lastY = currY;
         }
 
-        auto xoffset = (xpos - lastX) * 0.1f;
-        auto yoffset = (lastY - ypos) * 0.1f;
+        auto xoffset = (currX - lastX) * m_Camera.Sensitivity;
+        auto yoffset = (lastY - currY) * m_Camera.Sensitivity;
 
-        lastX = xpos;
-        lastY = ypos;
+        lastX = currX;
+        lastY = currY;
 
         if (pitch > 89.0f)
         {
@@ -162,12 +149,35 @@ void IslandScene::UpdateCameraMouseInput()
     }
     else if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_RELEASE)
     {
+        lastX = 0;
+        lastY = 0;
+
         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-        firstMouse = true;
     }
 }
 
-void IslandScene::RenderLight()
+void IslandScene::initLight()
+{
+    PointLight pinkPointLight;
+    pinkPointLight.Color = { 1.0f, 0.1f, 1.0f };
+    pinkPointLight.Position = { 30.0f, 10.0f, 0.0f };
+    pinkPointLight.Intensity = 500.0f;
+    m_PointLights.push_back(pinkPointLight);
+
+    PointLight whitePointLight;
+    whitePointLight.Color = { 1.0f, 1.0f, 1.0f };
+    whitePointLight.Position = { 30.0f, 5.0f, 150.0f };
+    whitePointLight.Intensity = 500.0f;
+    m_PointLights.push_back(whitePointLight);
+
+    PointLight randomPointLight;
+    randomPointLight.Color = { 0.0f, 1.0f, 0.0f };
+    randomPointLight.Position = { -230.0f, 75.0f, 120.0f };
+    randomPointLight.Intensity = 100.0f;
+    m_PointLights.push_back(randomPointLight);
+}
+
+void IslandScene::renderLight()
 {
 
     m_LampShaderProgram.use();
@@ -177,7 +187,8 @@ void IslandScene::RenderLight()
 
     for (int i = 0; i < m_PointLights.size(); ++i)
     {
-        auto& pointLight = m_PointLights[i];
+        const auto& pointLight = m_PointLights[i];
+
         m_shaderProgram.use();
         m_shaderProgram.setUniform(("u_PointLights[" + std::to_string(i) + "].Color").c_str(), pointLight.Color);
         m_shaderProgram.setUniform(("u_PointLights[" + std::to_string(i) + "].Position").c_str(), pointLight.Position);
@@ -196,13 +207,14 @@ void IslandScene::render()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 
-    RenderLight();
+    renderLight();
 
 
     m_shaderProgram.use();
     m_shaderProgram.setUniform("u_ViewPos", m_Camera.CameraPos);
     m_shaderProgram.setUniform("u_View", m_Camera.GetView());
     m_shaderProgram.setUniform("u_Projection", projection);
+
     m_shaderProgram.setUniform("u_ActivePointLights", static_cast<int>(m_PointLights.size()));
 
     m_Model->Draw(m_shaderProgram);
