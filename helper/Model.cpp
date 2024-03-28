@@ -31,6 +31,11 @@ void Model::Draw(GLSLProgram& program)
 	}
 }
 
+void Model::SetScale(float scale)
+{
+	SetScale(glm::vec3(scale));
+}
+
 void Model::SetScale(const glm::vec3& scale)
 {
 	for (auto& mesh : m_Meshes)
