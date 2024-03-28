@@ -37,7 +37,7 @@ vec3 CalculateBlinnPhong(vec3 normal, vec3 lightDir, vec3 viewDir, vec3 lightCol
     
     float spec = pow(max(dot(normal, halfDir), 0.0), 32);
 
-    return 0.1f * spec * lightColor;
+    return 0.1 * spec * lightColor;
 }
 
 
