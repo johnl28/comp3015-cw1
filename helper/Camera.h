@@ -10,6 +10,7 @@ struct Camera
 	glm::vec3 CameraPos = { 0.0f, 0.0f, 3.0f };
 	glm::vec3 CameraUp = { 0.0f, 1.0f, 0.0f };
 
+	float Sensitivity = 0.1f;
 	float Speed = 1.5f;
 	float Pitch = 0.0f;
 	float Yaw = -90.0f;
