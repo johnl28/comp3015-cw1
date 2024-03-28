@@ -2,18 +2,28 @@
 
 #define MAX_POINT_LIGHTS 10
 
-in vec3 FragNormal;
-in vec2 FragTextureCoords;
-in vec3 FragPos;
-in vec3 FragViewPos;
-
 out vec4 FragColor;
 
-uniform sampler2D u_TextureDiffuse;
+
+in FragmentInput {
+
+    vec3 Normal;
+    vec2 TextureCoords;
+    vec3 FragPosition;
+    vec3 FragViewPos;
+
+} FragIn;
 
 
 uniform bool u_UseTextureOpacity;
-uniform sampler2D u_TextureOpacity;
+
+uniform struct TextureSamplers {
+    sampler2D Diffuse;
+    sampler2D AlphaMap;
+} u_Textures;
+
+
+
 
 uniform vec3 u_ViewPos;
 uniform int u_ActivePointLights;
@@ -23,7 +33,6 @@ uniform struct PointLight {
     vec3 Color;
     float Intensity;
 }[MAX_POINT_LIGHTS] u_PointLights;
-
 
 
 uniform struct FogParams {
@@ -43,22 +52,21 @@ vec3 CalculateBlinnPhong(vec3 normal, vec3 lightDir, vec3 viewDir, vec3 lightCol
 
 void main() 
 {
-	vec3 norm = normalize(FragNormal);
+	vec3 norm = normalize(FragIn.Normal);
 
-    vec3 viewDir = normalize(u_ViewPos - FragPos);
+    vec3 viewDir = normalize(u_ViewPos - FragIn.FragPosition);
 
-	vec4 textureColor = texture(u_TextureDiffuse, FragTextureCoords);
+	vec4 textureColor = texture(u_Textures.Diffuse, FragIn.TextureCoords);
 
     if(u_UseTextureOpacity)
     {
-        float textureOpacity = texture(u_TextureOpacity, FragTextureCoords).r;
+        float textureOpacity = texture(u_Textures.AlphaMap, FragIn.TextureCoords).r;
     
         if(textureOpacity == 0)
         {
             discard;
         }
     }
-
 
 
     vec3 ambient = CalculateAmbientLight(0.01, vec3(1.0));
@@ -68,7 +76,7 @@ void main()
     for(int i = 0; i < u_ActivePointLights; i++)
     {
 
-        vec3 fragToLight = u_PointLights[i].Position - FragPos;
+        vec3 fragToLight = u_PointLights[i].Position - FragIn.FragPosition;
         float distanceToLight = length(fragToLight);
         vec3 lightDir = normalize(fragToLight);
 
@@ -83,7 +91,7 @@ void main()
 
     vec4 result = vec4(ambient + diffuse + specular, 1.0) * textureColor;
     
-    FragColor = CalculateFog(u_FogParams, FragViewPos, result);
+    FragColor = CalculateFog(u_FogParams, FragIn.FragViewPos, result);
 
 }
  
