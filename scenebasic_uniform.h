@@ -24,10 +24,15 @@ private:
     GLSLProgram m_shaderProgram;
     GLSLProgram m_LampShaderProgram;
 
+    GLSLProgram m_WaterShaderProgram;
+
     Camera m_Camera;
 
     Model* m_Model = nullptr;
     Model* m_LampModel = nullptr;
+    Model* m_Water = nullptr;
+
+    bool m_WireframeMode = false;
 
     std::vector<PointLight> m_PointLights;
 

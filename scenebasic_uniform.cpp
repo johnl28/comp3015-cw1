@@ -22,6 +22,8 @@ SceneBasic_Uniform::SceneBasic_Uniform() : angle(0.0f) {}
 
 void SceneBasic_Uniform::initScene()
 {
+    glPatchParameteri(GL_PATCH_VERTICES, 4);
+
     compile();
     projection = glm::perspective(glm::radians(80.0f), (float)width / (float)height, 0.1f, 1000.0f);
     m_Camera.CameraPos.z = 5.0f;
@@ -34,6 +36,11 @@ void SceneBasic_Uniform::initScene()
     m_shaderProgram.setUniform("u_FogParams.MinDist", 500.2f);
     m_shaderProgram.setUniform("u_FogParams.MaxDist", 1000.0f);
     m_shaderProgram.setUniform("u_FogParams.Color", glm::vec4(0.949f, 0.957f, 0.965f, 1.0f));
+
+    m_WaterShaderProgram.use();
+    m_WaterShaderProgram.setUniform("u_FogParams.MinDist", 500.2f);
+    m_WaterShaderProgram.setUniform("u_FogParams.MaxDist", 1000.0f);
+    m_WaterShaderProgram.setUniform("u_FogParams.Color", glm::vec4(0.949f, 0.957f, 0.965f, 1.0f));
 
     m_LampShaderProgram.use();
     m_LampShaderProgram.setUniform("u_FogParams.MinDist", 500.2f);
@@ -58,6 +65,15 @@ void SceneBasic_Uniform::compile()
         m_LampShaderProgram.compileShader("shader/common.frag");
         m_LampShaderProgram.compileShader("shader/lamp.frag");
         m_LampShaderProgram.link();
+
+        m_WaterShaderProgram.compileShader("shader/island_scene.vert");
+        m_WaterShaderProgram.compileShader("shader/water.tesc");
+        m_WaterShaderProgram.compileShader("shader/water.tese");
+        m_WaterShaderProgram.compileShader("shader/common.frag");
+        m_WaterShaderProgram.compileShader("shader/island_scene.frag");
+        m_WaterShaderProgram.link();
+
+
 	} 
     catch (GLSLProgramException &e) 
     {
@@ -88,6 +104,15 @@ void SceneBasic_Uniform::render()
 
     renderLight();
 
+    m_WaterShaderProgram.use();
+    m_WaterShaderProgram.setUniform("u_ViewPos", m_Camera.CameraPos);
+    m_WaterShaderProgram.setUniform("u_View", m_Camera.GetView());
+    m_WaterShaderProgram.setUniform("u_Projection", projection);
+
+    m_WaterShaderProgram.setUniform("u_ActivePointLights", static_cast<int>(m_PointLights.size()));
+
+    m_Water->Draw(m_WaterShaderProgram);
+
     m_shaderProgram.use();
     m_shaderProgram.setUniform("u_ViewPos", m_Camera.CameraPos);
     m_shaderProgram.setUniform("u_View", m_Camera.GetView());
@@ -115,6 +140,11 @@ void SceneBasic_Uniform::UpdateCameraInput()
     auto& cameraPos = m_Camera.CameraPos;
     auto& cameraFront = m_Camera.CameraFront;
     auto& cameraUp = m_Camera.CameraUp;
+
+    if (glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS)
+    {
+        glPolygonMode(GL_FRONT_AND_BACK, (m_WireframeMode = !m_WireframeMode) ? GL_LINE : GL_FILL);
+    }
 
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
     {
@@ -188,6 +218,8 @@ void SceneBasic_Uniform::initModels()
 
     m_LampModel = new Model("media/models/shapes/cube.fbx");
     m_LampModel->SetScale(glm::vec3(0.05f));
+
+    m_Water = new Model("media/models/shapes/plane.fbx");
 }
 
 void SceneBasic_Uniform::initLight()

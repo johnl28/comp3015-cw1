@@ -72,6 +72,8 @@
     <None Include="shader\skybox.vert" />
     <None Include="shader\lamp.frag" />
     <None Include="shader\lamp.vert" />
+    <None Include="shader\water.tesc" />
+    <None Include="shader\water.tese" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="helper\scene.h">
