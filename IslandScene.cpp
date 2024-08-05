@@ -198,7 +198,7 @@ void IslandScene::renderLight()
         m_LampShaderProgram.use();
         m_LampShaderProgram.setUniform("u_LightColor", pointLight.Color);
         m_LampModel->SetPosition(pointLight.Position);
-        m_LampModel->Draw(m_LampShaderProgram);
+        m_LampModel->Draw(m_LampShaderProgram, GL_TRIANGLES);
     }
 
 }
@@ -218,7 +218,7 @@ void IslandScene::render()
 
     m_shaderProgram.setUniform("u_ActivePointLights", static_cast<int>(m_PointLights.size()));
 
-    m_Model->Draw(m_shaderProgram);
+    m_Model->Draw(m_shaderProgram, GL_TRIANGLES);
 
     m_Skybox.Draw(m_Camera, projection);
 }
