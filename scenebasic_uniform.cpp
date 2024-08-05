@@ -22,6 +22,7 @@ SceneBasic_Uniform::SceneBasic_Uniform() : angle(0.0f) {}
 
 void SceneBasic_Uniform::initScene()
 {
+    glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
     glPatchParameteri(GL_PATCH_VERTICES, 4);
 
     compile();
@@ -66,7 +67,7 @@ void SceneBasic_Uniform::compile()
         m_LampShaderProgram.compileShader("shader/lamp.frag");
         m_LampShaderProgram.link();
 
-        m_WaterShaderProgram.compileShader("shader/island_scene.vert");
+        m_WaterShaderProgram.compileShader("shader/water.vert");
         m_WaterShaderProgram.compileShader("shader/water.tesc");
         m_WaterShaderProgram.compileShader("shader/water.tese");
         m_WaterShaderProgram.compileShader("shader/common.frag");
@@ -86,6 +87,10 @@ void SceneBasic_Uniform::update( float t )
 {
     UpdateCameraInput();
     UpdateCameraMouseInput();
+
+    m_WaterShaderProgram.use();
+    m_WaterShaderProgram.setUniform("u_Time", t);
+
 
     constexpr float radius = 150.0f;
     m_PointLights[0].Position.x = sin(t) * radius;
@@ -111,7 +116,7 @@ void SceneBasic_Uniform::render()
 
     m_WaterShaderProgram.setUniform("u_ActivePointLights", static_cast<int>(m_PointLights.size()));
 
-    m_Water->Draw(m_WaterShaderProgram);
+    m_Water->Draw(m_WaterShaderProgram, GL_PATCHES);
 
     m_shaderProgram.use();
     m_shaderProgram.setUniform("u_ViewPos", m_Camera.CameraPos);
@@ -120,7 +125,7 @@ void SceneBasic_Uniform::render()
 
     m_shaderProgram.setUniform("u_ActivePointLights", static_cast<int>(m_PointLights.size()));
 
-    m_Model->Draw(m_shaderProgram);
+    m_Model->Draw(m_shaderProgram,GL_TRIANGLES);
 
     m_Skybox.Draw(m_Camera, projection);
 }
@@ -131,8 +136,6 @@ void SceneBasic_Uniform::resize(int w, int h)
     height = h;
     glViewport(0,0,w,h);
 }
-
-
 
 void SceneBasic_Uniform::UpdateCameraInput()
 {
@@ -219,7 +222,13 @@ void SceneBasic_Uniform::initModels()
     m_LampModel = new Model("media/models/shapes/cube.fbx");
     m_LampModel->SetScale(glm::vec3(0.05f));
 
-    m_Water = new Model("media/models/shapes/plane.fbx");
+    m_Water = new Model("media/models/shapes/plane.obj");
+    auto waterTexture = new Texture("media/textures/water.png");
+    waterTexture->Type = TextureType::DIFFUSE;
+    m_Water->GetMesh(0)->AddTexture(waterTexture);
+    m_Water->SetScale(glm::vec3(800.0f));
+    m_Water->SetPosition(vec3(0, -60, 0));
+    
 }
 
 void SceneBasic_Uniform::initLight()
@@ -260,10 +269,15 @@ void SceneBasic_Uniform::renderLight()
         m_shaderProgram.setUniform(("u_PointLights[" + std::to_string(i) + "].Position").c_str(), pointLight.Position);
         m_shaderProgram.setUniform(("u_PointLights[" + std::to_string(i) + "].Intensity").c_str(), pointLight.Intensity);
 
+        m_WaterShaderProgram.use();
+        m_WaterShaderProgram.setUniform(("u_PointLights[" + std::to_string(i) + "].Color").c_str(), pointLight.Color);
+        m_WaterShaderProgram.setUniform(("u_PointLights[" + std::to_string(i) + "].Position").c_str(), pointLight.Position);
+        m_WaterShaderProgram.setUniform(("u_PointLights[" + std::to_string(i) + "].Intensity").c_str(), pointLight.Intensity);
+
         m_LampShaderProgram.use();
         m_LampShaderProgram.setUniform("u_LightColor", pointLight.Color);
         m_LampModel->SetPosition(pointLight.Position);
-        m_LampModel->Draw(m_LampShaderProgram);
+        m_LampModel->Draw(m_LampShaderProgram,GL_TRIANGLES);
     }
 
 }
