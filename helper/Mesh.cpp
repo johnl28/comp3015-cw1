@@ -41,7 +41,7 @@ Mesh::~Mesh()
     glDeleteVertexArrays(1, &m_VAO);
 }
 
-void Mesh::Draw(GLSLProgram& program)
+void Mesh::Draw(GLSLProgram& program,GLuint drawmode)
 {
     program.use();
     for (const auto& texture : m_Textures)
@@ -59,14 +59,18 @@ void Mesh::Draw(GLSLProgram& program)
         {
             program.setUniform("u_UseTextureOpacity", false);
         }
-
-
     }
 
     program.setUniform("u_Transform", GetTransform());
 
     glBindVertexArray(m_VAO);
-    glDrawElements(GL_TRIANGLES, m_Indices.size(), GL_UNSIGNED_INT, 0);
+
+    if (drawmode == GL_PATCHES) {
+        glDrawArrays(drawmode, 0, m_Vertices.size());
+    }
+    else {
+        glDrawElements(drawmode, m_Indices.size(), GL_UNSIGNED_INT, 0);
+    }
     glBindVertexArray(0);
 }
 

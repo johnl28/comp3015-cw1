@@ -22,7 +22,7 @@ public:
 	Mesh(const std::vector<Vertex>& vertices, const std::vector<GLuint> indices);
 	~Mesh();
 
-	void Draw(GLSLProgram& program);
+	void Draw(GLSLProgram& program, GLuint drawmode);
 	void SetScale(const glm::vec3& newScale) { m_Scale = newScale; }
 	void SetPosition(const glm::vec3& pos) { m_Position = pos; }
 
