@@ -6,16 +6,16 @@
 
 ## Features CW1
 - Basic Blinn-Phong lighting technique (only point light)
+- Diffuse & Alpha Mapping Textures
 - Multiple lights functionality
 - Gamma correction
-- Diffuse & Alpha Mapping Textures
-- Fog
-- Skybox
 - 3D model loading
+- Skybox
+- Fog
   
 ## Features CW2
  - Tessellation
- - Animated
+ - Animated polygons
 
 ## Controls
 
