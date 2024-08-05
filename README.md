@@ -2,17 +2,20 @@
 
 - A C++ OpenGL application for Games Graphics Pipelines (COMP3015) coursework, Plymouth University.
   
-  Features:
-  - Basic Blinn-Phong lighting technique (only point light)
-  - Multiple lights functionality
-  - Gamma correction
-  - Diffuse & Alpha Mapping Textures
-  - Fog
-  - Skybox
-  - 3D model loading
-  
-![image](https://github.com/johnl28/comp3015-cw1/assets/54412955/37712c0a-0997-4923-986a-a4f076eb616c)
+  ![ezgif-7-025bb4523e](https://github.com/user-attachments/assets/67cab44c-c155-456f-9861-758d65968f3b)
 
+## Features CW1
+- Basic Blinn-Phong lighting technique (only point light)
+- Multiple lights functionality
+- Gamma correction
+- Diffuse & Alpha Mapping Textures
+- Fog
+- Skybox
+- 3D model loading
+  
+## Features CW2
+ - Tessellation
+ - Animated
 
 ## Controls
 
