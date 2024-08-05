@@ -15,7 +15,19 @@
   
 ## Features CW2
  - Tessellation
- - Animated polygons
+ - Vertex Animations
+
+## Dependencies & Requirements
+
+ - Visual Studio 2022 (v143)
+ - ISO C++ 14 Standard
+
+  - [GLM](https://github.com/g-truc/glm)
+  - [GLFW](https://www.glfw.org/)
+  - [ASSIMP](https://github.com/assimp/assimp)
+  - [stb](https://github.com/nothings/stb)
+  - [Glad](https://glad.dav1d.de/)
+
 
 ## Controls
 
