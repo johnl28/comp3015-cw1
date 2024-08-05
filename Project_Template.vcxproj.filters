@@ -74,6 +74,7 @@
     <None Include="shader\lamp.vert" />
     <None Include="shader\water.tesc" />
     <None Include="shader\water.tese" />
+    <None Include="shader\water.vert" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="helper\scene.h">
