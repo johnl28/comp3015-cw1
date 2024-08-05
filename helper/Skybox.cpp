@@ -22,7 +22,7 @@ void Skybox::Draw(Camera& camera, const glm::mat4& projection)
 	m_ShaderProgram.setUniform("u_View", glm::mat4(glm::mat3(camera.GetView())));
 	m_ShaderProgram.setUniform("u_Projection", projection);
 
-	m_Mesh->Draw(m_ShaderProgram);
+	m_Mesh->Draw(m_ShaderProgram, GL_TRIANGLES);
 
 
 	glCullFace(GL_BACK);
