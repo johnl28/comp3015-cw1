@@ -23,11 +23,11 @@ Model::Model(const std::string& path)
 	std::cout << "Loaded model: " << m_FileName << std::endl;
 }
 
-void Model::Draw(GLSLProgram& program)
+void Model::Draw(GLSLProgram& program, GLuint drawmode)
 {
 	for (auto& mesh : m_Meshes)
 	{
-		mesh->Draw(program);
+		mesh->Draw(program,drawmode);
 	}
 }
 

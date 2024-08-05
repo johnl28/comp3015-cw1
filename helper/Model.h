@@ -15,7 +15,7 @@ class Model {
 
 public:
 	Model(const std::string& path);
-	void Draw(GLSLProgram& program);
+	void Draw(GLSLProgram& program, GLuint drawmode);
 
 	void SetScale(float scale);
 	void SetScale(const glm::vec3& scale);
