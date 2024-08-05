@@ -4,16 +4,12 @@
 
 out vec4 FragColor;
 
-
 in FragmentInput {
-
     vec3 Normal;
     vec2 TextureCoords;
     vec3 FragPosition;
     vec3 FragViewPos;
-
 } FragIn;
-
 
 uniform bool u_UseTextureOpacity;
 
@@ -21,8 +17,6 @@ uniform struct TextureSamplers {
     sampler2D Diffuse;
     sampler2D AlphaMap;
 } u_Textures;
-
-
 
 uniform vec3 u_ViewPos;
 uniform int u_ActivePointLights;
@@ -33,20 +27,16 @@ uniform struct PointLight {
     float Intensity;
 }[MAX_POINT_LIGHTS] u_PointLights;
 
-
 uniform struct FogParams {
     float MaxDist;
     float MinDist;
     vec4 Color;
 } u_FogParams;
 
-
 vec3 CalculateAmbientLight(float ambientStrength, vec3 lightColor);
 vec3 CalculateDiffusePointLight(vec3 normal, vec3 lightDir, vec3 lightColor);
 vec4 CalculateFog(FogParams fogParams, vec3 fragViewPos, vec4 fragColor);
 vec3 CalculateBlinnPhong(vec3 normal, vec3 lightDir, vec3 viewDir, vec3 lightColor);
-
-
 
 
 void main() 
